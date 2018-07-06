@@ -1,5 +1,3 @@
 node_modules/
 dist/
 .DS_Store
-/src/helpers/firebase.js
-firebase.js

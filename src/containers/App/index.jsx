@@ -6,6 +6,7 @@ import NoMatch from "../../components/NoMatch";
 import Navbar from "../../components/Navbar";
 import Login from "../Login";
 import Signup from "../Signup";
+import Wall from "../Wall";
 
 export default class App extends Component {
   static propTypes = {};
@@ -23,6 +24,7 @@ export default class App extends Component {
           <Switch>
             <Route exact path="/login" component={Login} />
             <Route exact path="/signup" component={Signup} />
+            <Route exact path="/wall" component={Wall} />
             <Route component={NoMatch} />
           </Switch>
         </BrowserRouter>
