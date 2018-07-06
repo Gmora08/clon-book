@@ -52,7 +52,10 @@ export default class Login extends Component {
           this.state.form.email.value,
           this.state.form.password.value
         )
-        .then(res => this.setState({ res }))
+        .then(res => {
+          localStorage.setItem("tokenElFeis", res.user.uid);
+          this.props.history.push("/");
+        })
         .catch(({ message }) =>
           this.setState({ formHasError: true, errorMessage: message })
         );

@@ -21,8 +21,8 @@ const View = ({
     <div className="col-12 col-sm-12 col-md-4 offset-md-4 col-lg-4 offset-lg-4">
       <Form
         canSubmitForm={canSubmitForm}
-        error={"errorMessage"}
-        formHasError={false}
+        error={errorMessage}
+        formHasError={formHasError}
         onSubmit={login}
         submitText={"Login"}
       >

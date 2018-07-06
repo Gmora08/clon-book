@@ -1,12 +1,11 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
 import { BrowserRouter, Route, Switch, Link } from "react-router-dom";
 
 import NoMatch from "../../components/NoMatch";
 import Navbar from "../../components/Navbar";
 import Login from "../Login";
 import Signup from "../Signup";
-import Wall from "../Wall";
+import AdminApp from "../AdminApp";
 
 export default class App extends Component {
   static propTypes = {};
@@ -24,7 +23,7 @@ export default class App extends Component {
           <Switch>
             <Route exact path="/login" component={Login} />
             <Route exact path="/signup" component={Signup} />
-            <Route exact path="/wall" component={Wall} />
+            <Route path="/" component={AdminApp} />
             <Route component={NoMatch} />
           </Switch>
         </BrowserRouter>
