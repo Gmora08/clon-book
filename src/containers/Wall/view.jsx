@@ -10,7 +10,8 @@ const View = ({
   handlePostFormChange,
   createPost,
   postForm,
-  deletePost
+  deletePost,
+  updatePost
 }) => (
   <div className="row">
     <div className="col-12 col-sm-12 col-md-4 offset-md-4 col-lg-4 offset-lg-4">
@@ -21,7 +22,15 @@ const View = ({
         handlePostFormChange={handlePostFormChange}
       />
       {posts.map(post => (
-        <Post key={post.id} id={post.id} deletePost={deletePost} img={post.img}>
+        <Post
+          key={post.id}
+          id={post.id}
+          content={post.content}
+          updatePost={updatePost}
+          deletePost={deletePost}
+          isPublic={post.isPublic}
+          img={post.img}
+        >
           {post.content}
         </Post>
       ))}

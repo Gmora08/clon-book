@@ -24,6 +24,7 @@ export default class Wall extends Component {
     this.handlePostFormChange = this.handlePostFormChange.bind(this);
     this.cleanPostForm = this.cleanPostForm.bind(this);
     this.deletePost = this.deletePost.bind(this);
+    this.updatePost = this.updatePost.bind(this);
   }
 
   componentDidMount() {
@@ -62,10 +63,20 @@ export default class Wall extends Component {
     this.setState({ postForm });
   }
 
+  updatePost(id, data) {
+    const posts = this.state.posts.map(
+      post => (post.id === id ? { ...data } : post)
+    );
+    const postRef = database.ref("posts").child(`${id}`);
+    postRef.update(data);
+    this.setState({ posts });
+  }
+
   deletePost(id) {
-    alert("k");
     const postRef = database.ref("posts").child(`${id}`);
     postRef.remove();
+    const posts = this.state.posts.filter(post => post.id !== id);
+    this.setState({ posts });
   }
 
   render() {
@@ -77,6 +88,7 @@ export default class Wall extends Component {
           postForm={this.state.postForm}
           posts={this.state.posts}
           deletePost={this.deletePost}
+          updatePost={this.updatePost}
         />
       </div>
     );

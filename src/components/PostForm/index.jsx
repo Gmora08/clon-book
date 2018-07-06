@@ -3,7 +3,14 @@ import PropTypes from "prop-types";
 
 import styles from "./styles.less";
 
-const PostForm = ({ createPost, content, handlePostFormChange, postForm }) => (
+const PostForm = ({
+  createPost,
+  content,
+  handlePostFormChange,
+  postForm,
+  editMode,
+  closeEditMode
+}) => (
   <form className={styles.postForm} onSubmit={createPost}>
     <input
       className={styles.content}
@@ -27,19 +34,28 @@ const PostForm = ({ createPost, content, handlePostFormChange, postForm }) => (
       <input
         className="btn btn-sm btn-primary"
         type="submit"
-        value="Publicar"
+        value={editMode ? "Editar" : "Publicar"}
       />
+      {editMode === true && (
+        <button className="btn btn-sm btn-danger" onClick={closeEditMode}>
+          Cancelar
+        </button>
+      )}
     </div>
   </form>
 );
 
 PostForm.propTypes = {
+  closeEditMode: PropTypes.func,
   content: PropTypes.string,
+  editMode: PropTypes.bool,
   handlePostFormChange: PropTypes.func.isRequired
 };
 
 PostForm.defaultProps = {
-  content: "Qué esta pasando?"
+  closeEditMode: () => "",
+  content: "Qué esta pasando?",
+  editMode: false
 };
 
 export default PostForm;
