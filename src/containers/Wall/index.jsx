@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import { database } from "../../helpers/firebase";
+import { database, storage } from "../../helpers/firebase";
 
 import View from "./view";
 
@@ -15,16 +15,20 @@ export default class Wall extends Component {
       posts: [],
       postForm: {
         content: "",
-        isPublic: false,
+        isPublic: true,
         img: ""
       },
-      isFetchingData: false
+      isFetchingData: false,
+      filter: true,
+      postFormDisabled: false
     };
     this.createPost = this.createPost.bind(this);
     this.handlePostFormChange = this.handlePostFormChange.bind(this);
     this.cleanPostForm = this.cleanPostForm.bind(this);
     this.deletePost = this.deletePost.bind(this);
     this.updatePost = this.updatePost.bind(this);
+    this.handleUploadSuccess = this.handleUploadSuccess.bind(this);
+    this.changeFilter = this.changeFilter.bind(this);
   }
 
   componentDidMount() {
@@ -44,6 +48,9 @@ export default class Wall extends Component {
   }
 
   handlePostFormChange({ target: { name, value } }) {
+    if (name === "isPublic") {
+      value = value === "true" ? true : false;
+    }
     this.setState(prevState => {
       prevState.postForm[name] = value;
       return { prevState };
@@ -52,14 +59,19 @@ export default class Wall extends Component {
 
   createPost(e) {
     e.preventDefault();
-    database.ref("posts").push(this.state.postForm);
-    const posts = this.state.posts;
-    posts.push(this.state.postForm);
-    this.setState({ posts }, this.cleanPostForm);
+    if (!this.state.postFormDisabled) {
+      const post = this.state.postForm;
+      const key = database.ref("posts").push(post).key;
+      post["id"] = key;
+      const posts = this.state.posts;
+      posts.push(post);
+      this.setState({ posts }, this.cleanPostForm);
+    }
+    return true;
   }
 
   cleanPostForm() {
-    const postForm = { content: "", isPublic: false, img: "" };
+    const postForm = { content: "", isPublic: true, img: "" };
     this.setState({ postForm });
   }
 
@@ -73,22 +85,51 @@ export default class Wall extends Component {
   }
 
   deletePost(id) {
-    const postRef = database.ref("posts").child(`${id}`);
-    postRef.remove();
-    const posts = this.state.posts.filter(post => post.id !== id);
-    this.setState({ posts });
+    const desicion = confirm("Estas seguro que deseas eliminar el post?");
+    if (desicion) {
+      const postRef = database.ref("posts").child(`${id}`);
+      postRef.remove();
+      const posts = this.state.posts.filter(post => post.id !== id);
+      this.setState({ posts });
+      return true;
+    }
+    return false;
+  }
+
+  handleUploadSuccess(filename) {
+    this.setState({ postFormDisabled: true });
+    storage
+      .ref("images")
+      .child(filename)
+      .getDownloadURL()
+      .then(url =>
+        this.setState(prevState => {
+          prevState.postForm.img = url;
+          return { postForm: prevState.postForm, postFormDisabled: false };
+        })
+      );
+  }
+
+  changeFilter() {
+    this.setState(prevState => ({ filter: !prevState.filter }));
   }
 
   render() {
+    const filter = this.state.filter;
+    const posts = this.state.posts.filter(post => post.isPublic === filter);
+
     return (
       <div>
         <View
+          postFormDisabled={this.state.postFormDisabled}
+          changeFilter={this.changeFilter}
           createPost={this.createPost}
           handlePostFormChange={this.handlePostFormChange}
           postForm={this.state.postForm}
-          posts={this.state.posts}
+          posts={posts}
           deletePost={this.deletePost}
           updatePost={this.updatePost}
+          handleUploadSuccess={this.handleUploadSuccess}
         />
       </div>
     );

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import { storage } from "../../helpers/firebase";
 
 import PostForm from "../PostForm";
 
@@ -10,16 +11,18 @@ export default class Post extends Component {
     super(props);
     this.state = {
       editMode: false,
+      postFormDisabled: false,
       postForm: {
         content: props.content,
         id: props.id,
-        img: "",
+        img: props.img,
         isPublic: props.isPublic
       }
     };
     this.handlePostFormChange = this.handlePostFormChange.bind(this);
     this.setEditMode = this.setEditMode.bind(this);
     this.updatePost = this.updatePost.bind(this);
+    this.handleUploadSuccess = this.handleUploadSuccess.bind(this);
   }
 
   setEditMode(e) {
@@ -28,16 +31,39 @@ export default class Post extends Component {
   }
 
   handlePostFormChange({ target: { name, value } }) {
+    if (name === "isPublic") {
+      value = value === "true" ? true : false;
+    }
     this.setState(prevState => {
       prevState.postForm[name] = value;
       return { prevState };
     });
   }
 
+  handleUploadSuccess(filename) {
+    this.setState({ postFormDisabled: true });
+    storage
+      .ref("images")
+      .child(filename)
+      .getDownloadURL()
+      .then(url =>
+        this.setState(prevState => {
+          console.log(prevState.postForm.img);
+          prevState.postForm.img = url;
+          console.log(prevState.postForm.img);
+          console.log(prevState.postForm);
+          return { postForm: prevState.postForm, postFormDisabled: false };
+        })
+      );
+  }
+
   updatePost(e) {
     e.preventDefault();
-    this.props.updatePost(this.props.id, this.state.postForm);
-    this.setState({ editMode: false });
+    if (!this.state.postFormDisabled) {
+      this.props.updatePost(this.props.id, this.state.postForm);
+      this.setState({ editMode: false });
+    }
+    return true;
   }
 
   render() {
@@ -46,16 +72,19 @@ export default class Post extends Component {
     if (this.state.editMode) {
       return (
         <PostForm
+          disabled={postFormDisabled}
           closeEditMode={this.setEditMode}
           editMode
           postForm={this.state.postForm}
           createPost={this.updatePost}
           handlePostFormChange={this.handlePostFormChange}
+          handleUploadSuccess={this.handleUploadSuccess}
         />
       );
     }
     return (
       <div className={styles.post}>
+        {img.length > 0 && <img className={styles.img} src={img} alt={img} />}
         <p className={styles.content}>{children}</p>
         <div className={styles.action}>
           <button className={styles.postAction} onClick={this.setEditMode}>
