@@ -72,7 +72,7 @@ export default class Post extends Component {
     if (this.state.editMode) {
       return (
         <PostForm
-          disabled={postFormDisabled}
+          disabled={this.state.postFormDisabled}
           closeEditMode={this.setEditMode}
           editMode
           postForm={this.state.postForm}
