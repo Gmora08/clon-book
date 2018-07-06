@@ -8,4 +8,12 @@ const isEmpty = value => (value.length ? true : false);
 const validatePasswords = (firstPassword, secondPassword) =>
   firstPassword === secondPassword;
 
-export { isEmpty, validateEmail, validatePasswords };
+const validateForm = form => {
+  const errors = Object.keys(form).filter(key => form[key].isValid === false);
+  if (errors.length) {
+    return false;
+  }
+  return true;
+};
+
+export { isEmpty, validateEmail, validatePasswords, validateForm };
